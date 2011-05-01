@@ -11,17 +11,6 @@
     <description>Builds, tests, and runs the project DiamondFinder.</description>
     <import file="nbproject/build-impl.xml"/>
     
-    <target name="-post-jar">
-        <copy todir="dist">
-            <fileset file="src/run.bat"/>
-            <fileset file="jnetpcap.dll"/>
-        </copy>
-        <copydir src="include" dest="dist/include"/>
-        
-        <copy todir="F:/My Dropbox/mini_projects/Diamond_finder">
-            <fileset dir="dist"/>
-        </copy>
-    </target>
     <!--
 
     There exist several targets which are by default empty and which can be 

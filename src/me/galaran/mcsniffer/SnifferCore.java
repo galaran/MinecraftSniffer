@@ -109,10 +109,8 @@ class SnifferCore {
 
     private void configureLogging() {        
         Handler mainHandler = null;
-        Handler diamondListHandler = null;
         try {
             mainHandler = new FileHandler("diamond_finder.log");
-            diamondListHandler = new FileHandler("diamonds.txt");
         } catch (IOException ex) {
             System.err.println("coudn't configure logging");
             Logger.getLogger("galaran.diamf").setLevel(Level.OFF);
@@ -131,21 +129,12 @@ class SnifferCore {
             }
         });
         
-        diamondListHandler.setFormatter(new Formatter() {
-
-            @Override
-            public String format(LogRecord record) {
-                return (formatMessage(record) + '\n');
-            }
-        });
-        
         Logger.getLogger("global").setLevel(Level.OFF); // library logs off
                 
         // global logging
         Logger.getLogger("galaran.diamf").setLevel(Level.ALL); 
         Logger.getLogger("galaran.diamf").setUseParentHandlers(false);
         Logger.getLogger("galaran.diamf.diamond_finder").addHandler(mainHandler);
-        Logger.getLogger("galaran.diamf.diamonds").addHandler(diamondListHandler);
     }
     
 }
