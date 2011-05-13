@@ -5,7 +5,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 import me.galaran.mcsniffer.util.Block;

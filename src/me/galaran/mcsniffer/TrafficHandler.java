@@ -22,7 +22,7 @@ import me.galaran.mcsniffer.packets.Packet35BlockChange;
 class TrafficHandler {
     
     private static final Logger log = Logger.getLogger("galaran.diamf.diamond_finder");
-    private final String logPrefix;
+    private final String handlerType;
     
     private final PacketProcessor proc;
     private final Map<Byte, Class<? extends Packet>> targetPackets;
@@ -33,7 +33,7 @@ class TrafficHandler {
     public TrafficHandler(PacketProcessor proc, boolean isServerPacketHandler) {
         this.proc = proc;
         this.targetPackets = (isServerPacketHandler ? serverPackets : clientPackets);
-        this.logPrefix = (isServerPacketHandler ? "[Server packet handler] " : "[Client Packet Handler] ");
+        this.handlerType = (isServerPacketHandler ? "[Server packet handler] " : "[Client Packet Handler] ");
     }
     
     public void handle(PcapPacketWrapper packet) {
@@ -49,14 +49,16 @@ class TrafficHandler {
         try {
             while (mainBuffer.position() < mainBuffer.limit() - 1) {
                 Packet probablyPacket = scanAndShiftPos();
-                if (probablyPacket != null)
+                if (probablyPacket != null) {
+                    log.log(Level.INFO, handlerType + "Complete packet {0}", probablyPacket.getClass().getName());
                     proc.processPacket(probablyPacket);
+                }
             }
             mainBuffer.compact();
         } catch (NeedMoreBytesException ex) {
             
             // need another fragment
-            log.log(Level.INFO, logPrefix + "Need another fragment! Shift pos to " + mainBuffer.limit());
+            log.log(Level.INFO, handlerType + "Need another fragment! Shift pos to " + mainBuffer.limit());
             
             // prepare to write
             mainBuffer.position(mainBuffer.limit());
@@ -81,21 +83,21 @@ class TrafficHandler {
         try {
             newPacket = targetPackets.get(code).newInstance();
         } catch (Exception ex) {
-            log.log(Level.SEVERE, logPrefix + "Error while creating packet instance");
+            log.log(Level.SEVERE, handlerType + "Error while creating packet instance");
             return null;
         }
         
         try {
             newPacket.readPacket(mainBuffer);
+            newPacket.code = code;
         } catch (Exception ex) {
-            log.log(Level.SEVERE,  logPrefix + "Error while constructing packet " + newPacket.getClass().getName());
+            log.log(Level.SEVERE,  handlerType + "Error while constructing packet " + newPacket.getClass().getName());
             
             newPacket = null;
             // change pos back to packet code + 1
             mainBuffer.reset();
             mainBuffer.get();
         }
-        newPacket.code = code;
         return newPacket;
     }
     
