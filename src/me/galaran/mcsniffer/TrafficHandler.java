@@ -56,7 +56,7 @@ class TrafficHandler {
         } catch (NeedMoreBytesException ex) {
             
             // need another fragment
-            //log.log(Level.INFO, logPrefix + "Need another fragment! Shift pos to " + mainBuffer.limit());
+            log.log(Level.INFO, logPrefix + "Need another fragment! Shift pos to " + mainBuffer.limit());
             
             // prepare to write
             mainBuffer.position(mainBuffer.limit());

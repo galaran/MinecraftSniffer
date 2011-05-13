@@ -113,7 +113,6 @@ class SnifferCore {
             mainHandler = new FileHandler("diamond_finder.log");
         } catch (IOException ex) {
             System.err.println("coudn't configure logging");
-            Logger.getLogger("galaran.diamf").setLevel(Level.OFF);
             return;
         }
         mainHandler.setFormatter(new Formatter() {
@@ -129,10 +128,6 @@ class SnifferCore {
             }
         });
         
-        Logger.getLogger("global").setLevel(Level.OFF); // library logs off
-                
-        // global logging
-        Logger.getLogger("galaran.diamf").setLevel(Level.ALL); 
         Logger.getLogger("galaran.diamf").setUseParentHandlers(false);
         Logger.getLogger("galaran.diamf.diamond_finder").addHandler(mainHandler);
     }
