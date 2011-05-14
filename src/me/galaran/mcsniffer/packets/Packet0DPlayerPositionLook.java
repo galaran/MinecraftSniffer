@@ -33,7 +33,7 @@ private static final Logger log = Logger.getLogger("galaran.diamf.diamond_finder
     }
 
     @Override
-    public boolean validate(ByteBuffer buff)  throws BufferUnderflowException {
+    public boolean validate(ByteBuffer buff) throws BufferUnderflowException {
         
         if ( Math.abs(buff.getDouble()) > Coord.MAX_X_ABS ) return false; // player cannot walk so far ;)
         double y = buff.getDouble();

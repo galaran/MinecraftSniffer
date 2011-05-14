@@ -47,11 +47,17 @@ class TrafficHandler {
     
     private void processBuffer() {
         mainBuffer.flip();
+        int remain;
         try {
             while (mainBuffer.position() < mainBuffer.limit() - 1) {
                 Packet probablyPacket = scanAndShiftPos();
                 if (probablyPacket != null) {
-                    mainBuffer.compact(); // cut used bytes
+                    // cut used bytes with relative limit unchanged
+                    remain = mainBuffer.remaining();
+                    mainBuffer.compact();
+                    mainBuffer.position(0);
+                    mainBuffer.limit(remain);
+                    
                     log.log(Level.INFO, handlerType + "Complete packet {0}", probablyPacket.getClass().getName());
                     proc.processPacket(probablyPacket);
                 }
@@ -69,24 +75,40 @@ class TrafficHandler {
         }
     }
 
+    /**
+     * Try to build packet with current buffer position
+     * Recieves buffer with pos = scanning begin
+     * Shifting:
+     *  -- Not possible to create packet (ret null) - shift 1 byte
+     *  -- Not enought bytes(NeedMoreBytesException) - first pos(not changed)
+     *  -- Packet creation success(ret not null) - first byte after created packet
+     *  -- Error creating packet - shift 1 byte (threats as not possible to create packet)
+     * @return packet or null, if not possible
+     * @throws NeedMoreBytesException begin of packet is valid, but not enought bytes
+     */
     public Packet scanAndShiftPos() throws NeedMoreBytesException {
         mainBuffer.mark();
         try {
-            if (!findAndValidate(mainBuffer))
+            if (!findAndValidate(mainBuffer)) {
+                // pos was shifted arbitrarily
+                mainBuffer.reset();
+                mainBuffer.get();
                 return null;
+            }
         } catch (BufferUnderflowException ex) {
             mainBuffer.reset();
             throw new NeedMoreBytesException();
         }
     
-        // its valid, construct packet
+        // its valid, build packet
         mainBuffer.reset();
         Packet newPacket;
         byte code = mainBuffer.get();
         try {
             newPacket = targetPackets.get(code).newInstance();
         } catch (Exception ex) {
-            log.log(Level.SEVERE, handlerType + "Error while creating packet instance");
+            log.log(Level.SEVERE, handlerType + "Error while building packet instance");
+            // pos is already shifted here
             return null;
         }
         
@@ -94,7 +116,7 @@ class TrafficHandler {
             newPacket.readPacket(mainBuffer);
             newPacket.code = code;
         } catch (Exception ex) {
-            log.log(Level.SEVERE,  handlerType + "Error while constructing packet " + newPacket.getClass().getName());
+            log.log(Level.SEVERE,  handlerType + "Error building packet " + newPacket.getClass().getName());
             
             newPacket = null;
             // change pos back to packet code + 1
