@@ -26,9 +26,6 @@ public class Packet33MapChunk extends Packet {
     public byte[]      decompressedData;
     public List<Block> blocks = new ArrayList<Block>();
     
-    private static final Inflater inflater = new Inflater();
-
-    
     @Override
     public void readPacket(ByteBuffer packet) throws Exception {
         X = packet.getInt();
@@ -41,12 +38,11 @@ public class Packet33MapChunk extends Packet {
         compressedData = new byte[compressedLength];
         packet.get(compressedData);
         
-        synchronized (inflater) {
-            inflater.reset();
-            inflater.setInput(compressedData);
-            decompressedData = new byte[81920];
-            inflater.inflate(decompressedData);
-        }
+        Inflater inflater = new Inflater();
+        inflater.reset();
+        inflater.setInput(compressedData);
+        decompressedData = new byte[81920];
+        inflater.inflate(decompressedData);
         
         int x, y, z;
         for (int i = 0; i < 128 * 16 * 16; i++) {
