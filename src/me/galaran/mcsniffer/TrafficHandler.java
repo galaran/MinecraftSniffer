@@ -22,7 +22,7 @@ import me.galaran.mcsniffer.packets.Packet35BlockChange;
 class TrafficHandler {
     
     private static final Logger log = Logger.getLogger("galaran.diamf.diamond_finder");
-    private final String handlerType;
+    private final String handlerType; // use for logging prefix
     
     private final PacketProcessor proc;
     private final Map<Byte, Class<? extends Packet>> targetPackets;
@@ -33,13 +33,14 @@ class TrafficHandler {
     public TrafficHandler(PacketProcessor proc, boolean isServerPacketHandler) {
         this.proc = proc;
         this.targetPackets = (isServerPacketHandler ? serverPackets : clientPackets);
-        this.handlerType = (isServerPacketHandler ? "[Server packet handler] " : "[Client Packet Handler] ");
+        this.handlerType = (isServerPacketHandler ? "[S] " : "[C] ");
     }
     
     public void handle(PcapPacketWrapper packet) {
         if (packet.isEmpty())
             return;
         
+        log.log(Level.FINE, handlerType + "Incoming data chunk, size = " + packet.getPayload().length);
         mainBuffer.put(packet.getPayload());
         processBuffer();
     }
@@ -50,17 +51,19 @@ class TrafficHandler {
             while (mainBuffer.position() < mainBuffer.limit() - 1) {
                 Packet probablyPacket = scanAndShiftPos();
                 if (probablyPacket != null) {
+                    mainBuffer.compact(); // cut used bytes
                     log.log(Level.INFO, handlerType + "Complete packet {0}", probablyPacket.getClass().getName());
                     proc.processPacket(probablyPacket);
                 }
             }
-            mainBuffer.compact();
+            mainBuffer.compact(); // cut trash bytes
+            log.log(Level.FINE, handlerType + "Buffer pos after compacting: " + mainBuffer.position());
         } catch (NeedMoreBytesException ex) {
             
             // need another fragment
             log.log(Level.INFO, handlerType + "Need another fragment! Shift pos to " + mainBuffer.limit());
             
-            // prepare to write
+            // preparing to append bytes to this buffer
             mainBuffer.position(mainBuffer.limit());
             mainBuffer.limit(mainBuffer.capacity());
         }
