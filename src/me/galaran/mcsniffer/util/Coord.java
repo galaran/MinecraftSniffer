@@ -2,9 +2,10 @@ package me.galaran.mcsniffer.util;
 
 public class Coord {
     public static int MAX_X_ABS = 100000;
-    public static int MIN_Y = -20000;
-    public static int MAX_Y = 200;
     public static int MAX_Z_ABS = 100000;
+    public static int PLAYER_MIN_Y = -20000;
+    public static int PLAYER_MAX_Y = 200;
+    public static int BLOCK_MAX_Y_ABS = 130;
     public static float MAX_YAW_ABS = 10000000;
     public static float MAX_PITCH_ABS = 90;
     

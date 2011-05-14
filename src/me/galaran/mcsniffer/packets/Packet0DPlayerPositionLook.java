@@ -37,7 +37,7 @@ private static final Logger log = Logger.getLogger("galaran.diamf.diamond_finder
         
         if ( Math.abs(buff.getDouble()) > Coord.MAX_X_ABS ) return false; // player cannot walk so far ;)
         double y = buff.getDouble();
-        if ( y < Coord.MIN_Y || y > Coord.MAX_Y ) return false; // player cannot fall down or fly so far ;)
+        if ( y < Coord.PLAYER_MIN_Y || y > Coord.PLAYER_MAX_Y ) return false; // player cannot fall down or fly so far ;)
         double stance = buff.getDouble();
         if (stance - y < 0.1 || stance - y > 1.65) return false; // Illegal Stance
         if ( Math.abs(buff.getDouble()) > Coord.MAX_Z_ABS ) return false; // player cannot walk so far ;)

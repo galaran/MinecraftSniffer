@@ -14,6 +14,7 @@ import me.galaran.mcsniffer.packets.Packet0CPlayerLook;
 import me.galaran.mcsniffer.packets.Packet0DPlayerPositionLook;
 import me.galaran.mcsniffer.packets.Packet33MapChunk;
 import me.galaran.mcsniffer.packets.Packet35BlockChange;
+import me.galaran.mcsniffer.packets.Packet82UpdateSign;
 
 /**
  * Packet format: http://mc.kev009.com/Protocol
@@ -144,6 +145,7 @@ class TrafficHandler {
     static {
         serverPackets.put((byte)0x33, Packet33MapChunk.class);
         serverPackets.put((byte)0x35, Packet35BlockChange.class);
+        serverPackets.put((byte)0x82, Packet82UpdateSign.class);
         
         clientPackets.put((byte)0x0B, Packet0BPlayerPosition.class);
         clientPackets.put((byte)0x0C, Packet0CPlayerLook.class);
