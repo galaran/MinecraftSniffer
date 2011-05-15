@@ -62,6 +62,8 @@ public class Packet82UpdateSign extends Packet {
         try {
             for (int i = 0; i < 4; i++) {
                 len = buff.getShort();
+                if (len < 0 || len > 20)
+                    return false;
                 if (len != 0) {
                     rawString = new byte[len * 2]; // 2 bytes per symbol
                     buff.get(rawString);
