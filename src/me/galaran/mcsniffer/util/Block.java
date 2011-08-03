@@ -11,7 +11,7 @@ public class Block {
 
     @Override
     public String toString() {
-        return "Block[" + coord + "]: " + id;
+        return "Block" + coord + ": " + id;
     }
 
     @Override
