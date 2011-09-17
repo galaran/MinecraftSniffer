@@ -4,7 +4,7 @@ public class McSniffer {
     
     private static McSniffer instance = null;
     
-    private PacketProcessor proc; 
+    private PacketHandler packetHandler; 
     private SnifferCore core;
 
     private McSniffer() {
@@ -16,16 +16,26 @@ public class McSniffer {
         return instance;
     }
 
-    public void registerHandler(byte code, PacketHandler handler) {
-        proc.registerHandler(code, handler);
+    /**
+     * Only registered processor per packet code
+     */
+    public void registerPacketProcessor(byte code, PacketProcessor ph) {
+        packetHandler.registerHandler(code, ph);
+    }
+    
+    /**
+     * Only registered processor per application
+     */
+    public void registerChunkProcessor(ChunkProcessor ch) {
+        packetHandler.registerChunkHandler(ch);
     }
 
-    public void sniffLoop() {
+    public void startSniff() {
         core.sniffLoop();
     }
 
     public void init(int ifNum, String server) {
-        proc = new PacketProcessor();
-        core = new SnifferCore(server, ifNum, proc);
+        packetHandler = new PacketHandler();
+        core = new SnifferCore(server, ifNum, packetHandler);
     }
 }

@@ -25,15 +25,15 @@ class SnifferCore {
     private final int IF_NUM;
     String SERVER_IP;
 
-    private final PacketProcessor proc;
-    private final TrafficHandler serverPacketsHandler;
-    private final TrafficHandler clientPacketsHandler;
+    private final PacketHandler proc;
+    private final TrafficAnalyzer serverPacketsAnalyzer;
+    private final TrafficAnalyzer clientPacketsAnalyzer;
     
     private Pcap pcap = null;
     private List<PcapIf> ifs = null;
     private PcapPacketHandler catcher = null;
 
-    public SnifferCore(String host, int ifNum, PacketProcessor proc) {
+    public SnifferCore(String host, int ifNum, PacketHandler proc) {
         this.SERVER_NAME = host;
         this.IF_NUM = ifNum;
         this.proc = proc;
@@ -41,8 +41,8 @@ class SnifferCore {
         configureLogging();
         
         // init
-        serverPacketsHandler = new TrafficHandler(this.proc, true);
-        clientPacketsHandler = new TrafficHandler(this.proc, false);
+        serverPacketsAnalyzer = new TrafficAnalyzer(this.proc, true);
+        clientPacketsAnalyzer = new TrafficAnalyzer(this.proc, false);
         
         // resolve server and local IP
         try {
@@ -92,9 +92,9 @@ class SnifferCore {
             public void nextPacket(PcapPacket packet, Object user) {
                 PcapPacketWrapper myPacket = new PcapPacketWrapper(packet, SERVER_IP);
                 if (myPacket.isServerPacket())
-                    serverPacketsHandler.handle(myPacket);
+                    serverPacketsAnalyzer.handle(myPacket);
                 else
-                    clientPacketsHandler.handle(myPacket);
+                    clientPacketsAnalyzer.handle(myPacket);
             }
         };
 }

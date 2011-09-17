@@ -20,28 +20,28 @@ import me.galaran.mcsniffer.packets.Packet82UpdateSign;
  * Packet format: http://mc.kev009.com/Protocol
  * @author Galaran
  */
-class TrafficHandler {
+class TrafficAnalyzer {
     
     private static final Logger log = Logger.getLogger("galaran.diamf.diamond_finder");
-    private final String handlerType; // use for logging prefix
+    private final String analyzerType; // use for logging prefix
     
-    private final PacketProcessor proc;
+    private final PacketHandler proc;
     private final Map<Byte, Class<? extends Packet>> targetPackets;
     private static final int MAIN_BUFFER_SIZE = 24 * 1024;
     
     private ByteBuffer mainBuffer = ByteBuffer.allocate(MAIN_BUFFER_SIZE);
 
-    public TrafficHandler(PacketProcessor proc, boolean isServerPacketHandler) {
+    public TrafficAnalyzer(PacketHandler proc, boolean isServerTrafficAnalyzer) {
         this.proc = proc;
-        this.targetPackets = (isServerPacketHandler ? serverPackets : clientPackets);
-        this.handlerType = (isServerPacketHandler ? "[S] " : "[C] ");
+        this.targetPackets = (isServerTrafficAnalyzer ? serverPackets : clientPackets);
+        this.analyzerType = (isServerTrafficAnalyzer ? "[S] " : "[C] ");
     }
     
     public void handle(PcapPacketWrapper packet) {
         if (packet.isEmpty())
             return;
         
-        log.log(Level.FINE, handlerType + "Incoming data chunk, size = " + packet.getPayload().length);
+        log.log(Level.FINE, analyzerType + "Incoming data chunk, size = " + packet.getPayload().length);
         mainBuffer.put(packet.getPayload());
         processBuffer();
     }
@@ -59,16 +59,16 @@ class TrafficHandler {
                     mainBuffer.position(0);
                     mainBuffer.limit(remain);
                     
-                    log.log(Level.INFO, handlerType + "Complete packet {0}", probablyPacket.getClass().getName());
+                    log.log(Level.INFO, analyzerType + "Complete packet {0}", probablyPacket.getClass().getName());
                     proc.processPacket(probablyPacket);
                 }
             }
             mainBuffer.compact(); // cut trash bytes
-            log.log(Level.FINE, handlerType + "Buffer pos after compacting: " + mainBuffer.position());
+            log.log(Level.FINE, analyzerType + "Buffer pos after compacting: " + mainBuffer.position());
         } catch (NeedMoreBytesException ex) {
             
             // need another fragment
-            log.log(Level.INFO, handlerType + "Need another fragment! Shift pos to " + mainBuffer.limit());
+            log.log(Level.INFO, analyzerType + "Need another fragment! Shift pos to " + mainBuffer.limit());
             
             // preparing to append bytes to this buffer
             mainBuffer.position(mainBuffer.limit());
@@ -108,7 +108,7 @@ class TrafficHandler {
         try {
             newPacket = targetPackets.get(code).newInstance();
         } catch (Exception ex) {
-            log.log(Level.SEVERE, handlerType + "Error while building packet instance");
+            log.log(Level.SEVERE, analyzerType + "Error while building packet instance");
             // pos is already shifted here
             return null;
         }
@@ -117,7 +117,7 @@ class TrafficHandler {
             newPacket.readPacket(mainBuffer);
             newPacket.code = code;
         } catch (Exception ex) {
-            log.log(Level.SEVERE,  handlerType + "Error building packet " + newPacket.getClass().getName());
+            log.log(Level.SEVERE,  analyzerType + "Error building packet " + newPacket.getClass().getName());
             
             newPacket = null;
             // change pos back to packet code + 1

@@ -19,6 +19,10 @@ public class Coord {
         this.z = z;
     }
     
+    public Coord(int x, int z) {
+        this(x, 0, z);
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
