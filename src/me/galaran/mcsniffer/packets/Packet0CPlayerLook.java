@@ -8,7 +8,7 @@ import me.galaran.mcsniffer.util.Coord;
 
 public class Packet0CPlayerLook extends Packet {
     
-    private static final Logger log = Logger.getLogger("galaran.diamf.diamond_finder");
+    private static final Logger log = Logger.getLogger("galaran.diamf.sniffer");
     
     public float         yaw; //1
     public float         pitch; //5

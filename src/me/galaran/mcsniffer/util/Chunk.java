@@ -35,6 +35,10 @@ public class Chunk {
     }
     
     public Block getBlockAt(Coord c) {
-        return new Block(c, chunkContent.get(c));
+        Byte blockId = chunkContent.get(c);
+        if (blockId == null) {
+            return null;
+        }
+        return new Block(c, blockId);
     }
 }

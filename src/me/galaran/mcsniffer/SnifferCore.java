@@ -1,15 +1,10 @@
 package me.galaran.mcsniffer;
 
-import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.jnetpcap.Pcap;
@@ -19,7 +14,7 @@ import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.packet.PcapPacketHandler;
 
 class SnifferCore {
-    private static final Logger log = Logger.getLogger("galaran.diamf.diamond_finder");
+    private static final Logger log = Logger.getLogger("galaran.diamf.sniffer");
 
     private final String SERVER_NAME;
     private final int IF_NUM;
@@ -108,28 +103,6 @@ class SnifferCore {
     }
 
     private void configureLogging() {        
-        Handler mainHandler = null;
-        try {
-            mainHandler = new FileHandler("diamond_finder.log");
-        } catch (IOException ex) {
-            System.err.println("coudn't configure logging");
-            return;
-        }
-        mainHandler.setFormatter(new Formatter() {
-
-            @Override
-            public String format(LogRecord record) {
-                StringBuilder buf = new StringBuilder();
-                buf.append(record.getLevel());
-                buf.append(": ");
-                buf.append(formatMessage(record));
-                buf.append('\n');
-                return buf.toString();
-            }
-        });
-        
         Logger.getLogger("galaran.diamf").setUseParentHandlers(false);
-        Logger.getLogger("galaran.diamf.diamond_finder").addHandler(mainHandler);
     }
-    
 }

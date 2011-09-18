@@ -12,7 +12,7 @@ import me.galaran.mcsniffer.util.Coord;
 
 class PacketHandler {
     
-    private static final Logger log = Logger.getLogger("galaran.diamf.diamond_finder");
+    private static final Logger log = Logger.getLogger("galaran.diamf.sniffer");
     private Map<Byte, PacketProcessor> packetProcessors = new HashMap<Byte, PacketProcessor>();
     private ChunkProcessor chunkProcessor = null;
     private List<Coord> alreadyProcessedChunks = null;

@@ -8,7 +8,7 @@ import me.galaran.mcsniffer.util.Coord;
 
 public class Packet35BlockChange extends Packet {
     
-    private static final Logger log = Logger.getLogger("galaran.diamf.diamond_finder");
+    private static final Logger log = Logger.getLogger("galaran.diamf.sniffer");
     
     private int         X; //1
     private byte        Y; //5

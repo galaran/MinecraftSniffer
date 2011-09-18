@@ -22,7 +22,7 @@ import me.galaran.mcsniffer.packets.Packet82UpdateSign;
  */
 class TrafficAnalyzer {
     
-    private static final Logger log = Logger.getLogger("galaran.diamf.diamond_finder");
+    private static final Logger log = Logger.getLogger("galaran.diamf.sniffer");
     private final String analyzerType; // use for logging prefix
     
     private final PacketHandler proc;

@@ -2,20 +2,15 @@ package me.galaran.mcsniffer.packets;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import java.util.zip.Inflater;
 
-import me.galaran.mcsniffer.util.Block;
 import me.galaran.mcsniffer.util.Chunk;
 import me.galaran.mcsniffer.util.Coord;
 
 public class Packet33MapChunk extends Packet {
     
-    private static final Logger log = Logger.getLogger("galaran.diamf.diamond_finder");
+    private static final Logger log = Logger.getLogger("galaran.diamf.sniffer");
     
     // absolute coordinates
     private int         X; //1

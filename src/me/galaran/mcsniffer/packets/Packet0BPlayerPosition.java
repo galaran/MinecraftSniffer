@@ -8,7 +8,7 @@ import me.galaran.mcsniffer.util.DoubleCoord;
 
 public class Packet0BPlayerPosition extends Packet {
     
-    private static final Logger log = Logger.getLogger("galaran.diamf.diamond_finder");
+    private static final Logger log = Logger.getLogger("galaran.diamf.sniffer");
     
     private double         x; //1
     private double         y; //9

@@ -10,7 +10,7 @@ import me.galaran.mcsniffer.util.Coord;
 
 public class Packet82UpdateSign extends Packet {
 
-    private static final Logger log = Logger.getLogger("galaran.diamf.diamond_finder");
+    private static final Logger log = Logger.getLogger("galaran.diamf.sniffer");
     //private int x; //1
     //private short y; //5
     //private int z; //7
