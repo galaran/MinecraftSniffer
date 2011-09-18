@@ -37,9 +37,10 @@ class PacketHandler {
         if (chunkProcessor != null && packet.code == (byte)0x33) {
             Packet33MapChunk chunkPacket = (Packet33MapChunk)packet;
             
-            Coord curChunkStartCoord = new Coord(chunkPacket.X, chunkPacket.Z);
+            Coord curChunkStartCoord = new Coord(chunkPacket.chunk.xOffset, chunkPacket.chunk.zOffset);
             if (!alreadyProcessedChunks.contains(curChunkStartCoord)) {
-                chunkProcessor.processChunk(chunkPacket.blocks);
+                // convert block list to map
+                chunkProcessor.processChunk(chunkPacket.chunk);
             } else {
                 log.info("Duplicated chunk starts at: " + curChunkStartCoord);
             }

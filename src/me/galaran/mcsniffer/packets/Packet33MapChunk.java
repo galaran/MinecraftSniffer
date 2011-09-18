@@ -3,28 +3,32 @@ package me.galaran.mcsniffer.packets;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.zip.Inflater;
 
 import me.galaran.mcsniffer.util.Block;
+import me.galaran.mcsniffer.util.Chunk;
 import me.galaran.mcsniffer.util.Coord;
 
 public class Packet33MapChunk extends Packet {
     
     private static final Logger log = Logger.getLogger("galaran.diamf.diamond_finder");
     
-    public int         X; //1
-    public short       Y; //5
-    public int         Z; //7
+    // absolute coordinates
+    private int         X; //1
+    private short       Y; //5
+    private int         Z; //7
     public byte        sizeX; //11
     public byte        sizeY; //12
     public byte        sizeZ; //13
-    public int         compressedLength; //14
+    private int         compressedLength; //14
     private byte[]     compressedData; //18
     
-    public byte[]      decompressedData;
-    public List<Block> blocks = new ArrayList<Block>();
+    private byte[]      decompressedData;
+    public Chunk chunk;
     
     private static final Inflater inflater = new Inflater();
     
@@ -47,13 +51,7 @@ public class Packet33MapChunk extends Packet {
             inflater.inflate(decompressedData);
         }
         
-        int x, y, z;
-        for (int i = 0; i < 128 * 16 * 16; i++) {
-            x = X + (i >> 11);
-            y = i & 127;
-            z = Z + ((i >> 7) & 15);
-            blocks.add(new Block(x, y, z, decompressedData[i]));
-        }
+        chunk = new Chunk(decompressedData, X, Z);
     }
 
     @Override

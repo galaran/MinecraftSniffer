@@ -4,9 +4,13 @@ public class Block {
     public int id;
     public Coord coord;
 
-    public Block(int x, int y, int z, int id) {
-        coord = new Coord(x, y, z);
+    public Block(Coord coord, int id) {
         this.id = id;
+        this.coord = coord;
+    }
+    
+    public Block(int x, int y, int z, int id) {
+        this(new Coord(x, y, z), id);
     }
 
     @Override
@@ -31,5 +35,12 @@ public class Block {
         }
         return true;
     }
-    
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 41 * hash + this.id;
+        hash = 41 * hash + (this.coord != null ? this.coord.hashCode() : 0);
+        return hash;
+    }
 }

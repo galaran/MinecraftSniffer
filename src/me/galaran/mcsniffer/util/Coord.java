@@ -23,6 +23,11 @@ public class Coord {
         this(x, 0, z);
     }
     
+    public Coord(Coord orig, int xOff, int yOff, int zOff) {
+        this(orig.x + xOff, orig.y + yOff, orig.z + zOff);
+    }
+    
+    
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -48,7 +53,14 @@ public class Coord {
     public String toString() {
         return "[" + x + ", " + y + ", " + z + "]";
     }
-    
-    
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 29 * hash + this.x;
+        hash = 29 * hash + this.y;
+        hash = 29 * hash + this.z;
+        return hash;
+    }
     
 }

@@ -1,7 +1,7 @@
 package me.galaran.mcsniffer;
 
-import java.util.List;
-import me.galaran.mcsniffer.util.Block;
+
+import me.galaran.mcsniffer.util.Chunk;
 
 /**
  * Guarantees process non duplicate chunks
@@ -9,5 +9,5 @@ import me.galaran.mcsniffer.util.Block;
  */
 public interface ChunkProcessor {
     
-    public void processChunk(List<Block> chunk);
+    public void processChunk(Chunk chunk);
 }
