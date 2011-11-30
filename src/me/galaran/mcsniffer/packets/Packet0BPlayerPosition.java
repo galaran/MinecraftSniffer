@@ -3,7 +3,7 @@ package me.galaran.mcsniffer.packets;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.logging.Logger;
-import me.galaran.mcsniffer.util.Coord;
+import me.galaran.mcsniffer.util.Vec3D;
 import me.galaran.mcsniffer.util.DoubleCoord;
 
 public class Packet0BPlayerPosition extends Packet {
@@ -31,13 +31,13 @@ public class Packet0BPlayerPosition extends Packet {
     @Override
     public boolean validate(ByteBuffer buff)  throws BufferUnderflowException {
 
-        if ( Math.abs(buff.getDouble()) > Coord.MAX_X_ABS ) return false; // player cannot walk so far ;)
+        if ( Math.abs(buff.getDouble()) > Vec3D.MAX_X_ABS ) return false; // player cannot walk so far ;)
         double y = buff.getDouble();
-        if ( y < Coord.PLAYER_MIN_Y || y > Coord.PLAYER_MAX_Y ) return false; // player cannot fall down or fly so far ;)
+        if ( y < Vec3D.PLAYER_MIN_Y || y > Vec3D.PLAYER_MAX_Y ) return false; // player cannot fall down or fly so far ;)
         //stance
         double stance = buff.getDouble();
         if (stance - y < 0.1 || stance - y > 1.65) return false; // Illegal Stance
-        if ( Math.abs(buff.getDouble()) > Coord.MAX_Z_ABS ) return false; // player cannot walk so far ;)
+        if ( Math.abs(buff.getDouble()) > Vec3D.MAX_Z_ABS ) return false; // player cannot walk so far ;)
         
         byte onGround = buff.get();
         if ( !(onGround == 0 || onGround == 1) ) return false; // invalid onGround

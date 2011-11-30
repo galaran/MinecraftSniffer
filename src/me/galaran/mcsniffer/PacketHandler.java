@@ -1,21 +1,21 @@
 package me.galaran.mcsniffer;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import me.galaran.mcsniffer.packets.Packet;
 import me.galaran.mcsniffer.packets.Packet33MapChunk;
-import me.galaran.mcsniffer.util.Coord;
+import me.galaran.mcsniffer.util.Vec3D;
 
 class PacketHandler {
     
     private static final Logger log = Logger.getLogger("galaran.diamf.sniffer");
-    private Map<Byte, PacketProcessor> packetProcessors = new HashMap<Byte, PacketProcessor>();
+    private Map<Byte, PacketProcessor> packetProcessors = new HashMap<>();
     private ChunkProcessor chunkProcessor = null;
-    private List<Coord> alreadyProcessedChunks = null;
+    private Set<Vec3D> alreadyProcessedChunks = null;
     
     public synchronized void registerHandler(byte packetCode, PacketProcessor handler) {
         packetProcessors.put(packetCode, handler);
@@ -24,9 +24,9 @@ class PacketHandler {
     /**
      * Only for map chunk packet. Guarantees process chunks without duplicates
      */
-    public void registerChunkHandler(ChunkProcessor ch) {
-        chunkProcessor = ch;
-        alreadyProcessedChunks = new ArrayList<Coord>();
+    public void registerChunkHandler(ChunkProcessor chProc) {
+        chunkProcessor = chProc;
+        alreadyProcessedChunks = new HashSet<>();
     }
     
     /**
@@ -35,17 +35,16 @@ class PacketHandler {
     public void processPacket(Packet packet) {
         // chunk packet - process it
         if (chunkProcessor != null && packet.code == (byte)0x33) {
-            Packet33MapChunk chunkPacket = (Packet33MapChunk)packet;
+            Packet33MapChunk chunkPacket = (Packet33MapChunk) packet;
             
-            Coord curChunkStartCoord = new Coord(chunkPacket.chunk.xOffset, chunkPacket.chunk.zOffset);
-            if (!alreadyProcessedChunks.contains(curChunkStartCoord)) {
-                // convert block list to map
+            Vec3D chunkVec = new Vec3D(chunkPacket.chunk.xOffset, 0, chunkPacket.chunk.zOffset);
+            if (!alreadyProcessedChunks.contains(chunkVec)) {
+                // process this new chunk and mark it
                 chunkProcessor.processChunk(chunkPacket.chunk);
+                alreadyProcessedChunks.add(chunkVec);
             } else {
-                log.info("Duplicated chunk starts at: " + curChunkStartCoord);
+                log.info("Duplicated chunk: " + chunkVec);
             }
-            
-            alreadyProcessedChunks.add(curChunkStartCoord);
         }
         
         // general packet

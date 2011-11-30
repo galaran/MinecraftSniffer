@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 import java.util.zip.Inflater;
 
 import me.galaran.mcsniffer.util.Chunk;
-import me.galaran.mcsniffer.util.Coord;
+import me.galaran.mcsniffer.util.Vec3D;
 
 public class Packet33MapChunk extends Packet {
     
@@ -52,9 +52,9 @@ public class Packet33MapChunk extends Packet {
     @Override
     public boolean validate(ByteBuffer buff) throws BufferUnderflowException {
         
-        if (Math.abs(buff.getInt()) > Coord.MAX_X_ABS) return false; // player cannot walk so far ;)
+        if (Math.abs(buff.getInt()) > Vec3D.MAX_X_ABS) return false; // player cannot walk so far ;)
         if (buff.getShort() != 0) return false; // chunk y always 0
-        if (Math.abs(buff.getInt()) > Coord.MAX_Z_ABS) return false; // player cannot walk so far ;)
+        if (Math.abs(buff.getInt()) > Vec3D.MAX_Z_ABS) return false; // player cannot walk so far ;)
         
         // chunk bounds
         if (buff.get() != 15) return false;

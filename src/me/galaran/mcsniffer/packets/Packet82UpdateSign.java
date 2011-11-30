@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import me.galaran.mcsniffer.util.Coord;
+import me.galaran.mcsniffer.util.Vec3D;
 
 public class Packet82UpdateSign extends Packet {
 
@@ -15,11 +15,11 @@ public class Packet82UpdateSign extends Packet {
     //private short y; //5
     //private int z; //7
     public String[] signStrings;
-    public Coord coord;
+    public Vec3D coord;
 
     @Override
     public void readPacket(ByteBuffer buff) throws Exception {
-        coord = new Coord(buff.getInt(), buff.getShort(), buff.getInt());
+        coord = new Vec3D(buff.getInt(), buff.getShort(), buff.getInt());
         
         short len;
         String curStr;
@@ -45,14 +45,14 @@ public class Packet82UpdateSign extends Packet {
     @Override
     public boolean validate(ByteBuffer buff) throws BufferUnderflowException {
         
-        if (Math.abs(buff.getInt()) > Coord.MAX_X_ABS) {
+        if (Math.abs(buff.getInt()) > Vec3D.MAX_X_ABS) {
             return false; // block x must be in interval [-MAX_X_ABS; +MAX_X_ABS]
         }
         
-        if (Math.abs(buff.getShort()) > Coord.BLOCK_MAX_Y_ABS) {
+        if (Math.abs(buff.getShort()) > Vec3D.BLOCK_MAX_Y_ABS) {
             return false; // block y must be in interval [-BLOCK_MAX_Y_ABS; +BLOCK_MAX_Y_ABS]
         }
-        if (Math.abs(buff.getInt()) > Coord.MAX_Z_ABS) {
+        if (Math.abs(buff.getInt()) > Vec3D.MAX_Z_ABS) {
             return false; // block z must be in interval [-MAX_Z_ABS; +MAX_Z_ABS]
         }
         

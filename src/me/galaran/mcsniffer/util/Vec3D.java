@@ -1,6 +1,6 @@
 package me.galaran.mcsniffer.util;
 
-public class Coord {
+public class Vec3D {
     public static int MAX_X_ABS = 100000;
     public static int MAX_Z_ABS = 100000;
     public static int PLAYER_MIN_Y = -20000;
@@ -13,17 +13,13 @@ public class Coord {
     public int y;
     public int z;
 
-    public Coord(int x, int y, int z) {
+    public Vec3D(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
     
-    public Coord(int x, int z) {
-        this(x, 0, z);
-    }
-    
-    public Coord(Coord orig, int xOff, int yOff, int zOff) {
+    public Vec3D(Vec3D orig, int xOff, int yOff, int zOff) {
         this(orig.x + xOff, orig.y + yOff, orig.z + zOff);
     }
     
@@ -36,7 +32,7 @@ public class Coord {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Coord other = (Coord) obj;
+        final Vec3D other = (Vec3D) obj;
         if (this.x != other.x) {
             return false;
         }

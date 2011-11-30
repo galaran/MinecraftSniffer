@@ -4,7 +4,7 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 
-import me.galaran.mcsniffer.util.Coord;
+import me.galaran.mcsniffer.util.Vec3D;
 
 public class Packet0CPlayerLook extends Packet {
     
@@ -25,11 +25,11 @@ public class Packet0CPlayerLook extends Packet {
     public boolean validate(ByteBuffer buff) throws BufferUnderflowException {
 
         float yaw = buff.getFloat();
-        if (Math.abs(yaw) > Coord.MAX_YAW_ABS) return false; // invalid vertical yaw
+        if (Math.abs(yaw) > Vec3D.MAX_YAW_ABS) return false; // invalid vertical yaw
         // super hack
         if (String.valueOf(yaw).contains("E")) return false;
         
-        if (Math.abs(buff.getFloat()) > Coord.MAX_PITCH_ABS) return false; // invalid vertical pitch
+        if (Math.abs(buff.getFloat()) > Vec3D.MAX_PITCH_ABS) return false; // invalid vertical pitch
         
         byte onGround = buff.get();
         if ( !(onGround == 0 || onGround == 1) ) return false; // invalid onGround

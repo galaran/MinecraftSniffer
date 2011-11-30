@@ -37,12 +37,9 @@ class TrafficAnalyzer {
         this.analyzerType = (isServerTrafficAnalyzer ? "[S] " : "[C] ");
     }
     
-    public void handle(PcapPacketWrapper packet) {
-        if (packet.isEmpty())
-            return;
-        
-        log.log(Level.FINE, analyzerType + "Incoming data chunk, size = " + packet.getPayload().length);
-        mainBuffer.put(packet.getPayload());
+    public void handle(byte[] payload) {
+        log.log(Level.FINE, analyzerType + "Incoming data chunk, size = " + payload.length);
+        mainBuffer.put(payload);
         processBuffer();
     }
     
@@ -65,7 +62,7 @@ class TrafficAnalyzer {
             }
             mainBuffer.compact(); // cut trash bytes
             log.log(Level.FINE, analyzerType + "Buffer pos after compacting: " + mainBuffer.position());
-        } catch (NeedMoreBytesException ex) {
+        } catch (BufferUnderflowException ex) {
             
             // need another fragment
             log.log(Level.INFO, analyzerType + "Need another fragment! Shift pos to " + mainBuffer.limit());
@@ -87,7 +84,7 @@ class TrafficAnalyzer {
      * @return packet or null, if not possible
      * @throws NeedMoreBytesException begin of packet is valid, but not enought bytes
      */
-    public Packet scanAndShiftPos() throws NeedMoreBytesException {
+    public Packet scanAndShiftPos() throws BufferUnderflowException {
         mainBuffer.mark();
         try {
             if (!findAndValidate(mainBuffer)) {
@@ -98,7 +95,7 @@ class TrafficAnalyzer {
             }
         } catch (BufferUnderflowException ex) {
             mainBuffer.reset();
-            throw new NeedMoreBytesException();
+            throw ex;
         }
     
         // its valid, build packet
@@ -138,7 +135,7 @@ class TrafficAnalyzer {
     
     private final static Map<Byte, Class<? extends Packet>> serverPackets = new HashMap<Byte, Class<? extends Packet>>();
     private final static Map<Byte, Class<? extends Packet>> clientPackets = new HashMap<Byte, Class<? extends Packet>>();
-    private final static Map<Byte, Class<? extends Packet>> allPackets = new HashMap<Byte, Class<? extends Packet>>();
+    private final static Map<Byte, Class<? extends Packet>> packetMap = new HashMap<Byte, Class<? extends Packet>>();
     
     private final static Map<Byte, PacketValidator> validators = new HashMap<Byte, PacketValidator>();
     
@@ -151,14 +148,14 @@ class TrafficAnalyzer {
         clientPackets.put((byte)0x0C, Packet0CPlayerLook.class);
         clientPackets.put((byte)0x0D, Packet0DPlayerPositionLook.class);
         
-        allPackets.putAll(serverPackets);
-        allPackets.putAll(clientPackets);
+        packetMap.putAll(serverPackets);
+        packetMap.putAll(clientPackets);
         
-        for (Map.Entry<Byte, Class<? extends Packet>> entry : allPackets.entrySet()) {
+        for (Map.Entry<Byte, Class<? extends Packet>> entry : packetMap.entrySet()) {
             try {
                 validators.put(entry.getKey(), (PacketValidator) entry.getValue().newInstance());
             } catch (Exception ex) {
-                log.log(Level.SEVERE, "Error while constructing validators map");
+                log.log(Level.SEVERE, "Error constructing validators map");
                 ex.printStackTrace();
             }
         }
@@ -166,7 +163,7 @@ class TrafficAnalyzer {
     }
     
     public static Map<Byte, Class<? extends Packet>> getPacketMap() {
-        return allPackets;
+        return packetMap;
     }
     
 }

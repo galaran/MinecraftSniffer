@@ -3,6 +3,7 @@ package me.galaran.mcsniffer;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,24 +13,29 @@ import org.jnetpcap.PcapBpfProgram;
 import org.jnetpcap.PcapIf;
 import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.packet.PcapPacketHandler;
+import org.jnetpcap.packet.format.FormatUtils;
+import org.jnetpcap.protocol.network.Ip4;
+import org.jnetpcap.protocol.tcpip.Tcp;
 
 class SnifferCore {
     private static final Logger log = Logger.getLogger("galaran.diamf.sniffer");
 
-    private final String SERVER_NAME;
+    private final String HOST;
     private final int IF_NUM;
-    String SERVER_IP;
+    private byte[] SERVER_IP;
 
     private final PacketHandler proc;
     private final TrafficAnalyzer serverPacketsAnalyzer;
     private final TrafficAnalyzer clientPacketsAnalyzer;
     
-    private Pcap pcap = null;
-    private List<PcapIf> ifs = null;
-    private PcapPacketHandler catcher = null;
+    private final Pcap pcap;
+    private final List<PcapIf> ifs;
+    private final PcapPacketHandler catcher;
+    private final Ip4 ip4 = new Ip4();
+    private final Tcp tcp = new Tcp();
 
-    public SnifferCore(String host, int ifNum, PacketHandler proc) {
-        this.SERVER_NAME = host;
+    SnifferCore(String host, int ifNum, PacketHandler proc) {
+        this.HOST = host;
         this.IF_NUM = ifNum;
         this.proc = proc;
 
@@ -41,9 +47,9 @@ class SnifferCore {
         
         // resolve server and local IP
         try {
-            SERVER_IP = Inet4Address.getByName(SERVER_NAME).getHostAddress();
+            SERVER_IP = Inet4Address.getByName(HOST).getAddress();
         } catch (UnknownHostException ex) {
-            log.log(Level.INFO, "Coudnt resolve hostname {0}", SERVER_NAME);
+            log.log(Level.INFO, "Coudnt resolve hostname {0}", HOST);
             System.exit(1);
         }
         
@@ -70,7 +76,7 @@ class SnifferCore {
 
         //filter
         PcapBpfProgram filter = new PcapBpfProgram();
-        String expression = "host " +  SERVER_IP;
+        String expression = "ip and tcp and host " + FormatUtils.ip(SERVER_IP);
         int optimize = 0; // 1 means true, 0 means false
         int netmask = 0;
 
@@ -85,11 +91,27 @@ class SnifferCore {
 
             @Override
             public void nextPacket(PcapPacket packet, Object user) {
-                PcapPacketWrapper myPacket = new PcapPacketWrapper(packet, SERVER_IP);
-                if (myPacket.isServerPacket())
-                    serverPacketsAnalyzer.handle(myPacket);
-                else
-                    clientPacketsAnalyzer.handle(myPacket);
+                
+                boolean isServerPacket = false;
+                packet.getHeader(ip4);
+                if (Arrays.equals(ip4.source(), SERVER_IP)) {
+                    isServerPacket = true;
+                }
+
+                packet.getHeader(tcp);
+                byte[] payload;
+                if (tcp.getPayloadLength() > 0) {
+                    payload = tcp.getPayload();
+                } else {
+                    return; // ignore this packet
+                }
+                
+                // process packet
+                if (isServerPacket) {
+                    serverPacketsAnalyzer.handle(payload);
+                } else {
+                    clientPacketsAnalyzer.handle(payload);
+                }
             }
         };
 }
@@ -97,7 +119,7 @@ class SnifferCore {
     @SuppressWarnings("unchecked")
     public void sniffLoop() {
         int count = 0; // Capture packet count
-        System.out.println("\nStart listerning at " + SERVER_IP + " on if " + ifs.get(IF_NUM).getDescription());
+        System.out.println("\nStart listerning at " + FormatUtils.ip(SERVER_IP) + " on if " + ifs.get(IF_NUM).getDescription());
         pcap.loop(count, catcher, null);
         pcap.close();
     }

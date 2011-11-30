@@ -1,16 +1,16 @@
 package me.galaran.mcsniffer.util;
 
 public class Block {
-    public int id;
-    public Coord coord;
+    public int id; // TODO: byte
+    public Vec3D coord;
 
-    public Block(Coord coord, int id) {
+    public Block(Vec3D coord, int id) {
         this.id = id;
         this.coord = coord;
     }
     
     public Block(int x, int y, int z, int id) {
-        this(new Coord(x, y, z), id);
+        this(new Vec3D(x, y, z), id);
     }
 
     @Override
